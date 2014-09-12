@@ -1,0 +1,16 @@
+<% if user.followers.include?(current_user) %>
+  <% initial_follow_state = "followed" %>
+<% else %>
+  <% initial_follow_state = "unfollowed" %>
+<% end %>
+
+<button type="button"
+        class="follow-toggle"
+        data-user-id="<%= user.id %>"
+        data-initial-follow-state="<%= initial_follow_state %>"></button>
+
+<script>
+  $(function () {
+    $("button.follow-toggle").followToggle();
+  });
+<script>

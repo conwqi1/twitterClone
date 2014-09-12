@@ -1,0 +1,85 @@
+<h1>Search!</h1>
+
+<div class="users-search">
+  <label>User Search</label>
+  <input type="text">
+  <ul class="users-search">
+  </ul>
+</div>
+
+<ul>
+  <% @users.each do |user| %>
+    <li>
+      <%= link_to user.username, user_url(user) %>
+      <%= render "follows/form", user: user %>
+    </li>
+  <% end %>
+</ul>
+
+
+<script type="text/template" id="user-link-template">
+  <%% var followState = "unfollowed"; %>
+  <%% if (user.followed === true) { followState = "followed" }; %>
+  
+  <li>
+    <a href="/users/<%%= user.id %>"><%%= user.username %></a>
+    <button type="button"
+            class="follow-toggle"
+            data-user-id="<%%= user.id %>"
+            data-initial-follow-state="<%%= followState %>"></button>
+  </li>
+</script>
+
+<script>
+  $.UserSearch = function (el) {
+    this.$el = $(el);
+    this.$input = this.$el.find("input");
+    this.$ul = this.$el.find("ul");
+    this.$input.on("input", this.handleInput.bind(this));
+  };
+  
+  $.UserSearch.prototype.handleInput = function(event) {
+    var obj = {
+      data: { query: $(event.currentTarget).val() },
+      dataType: "json",
+      url: "search",
+      success: (this.renderResults.bind(this)),
+      type: "GET"
+    }
+    
+    $.ajax(obj);
+  };
+  
+  $.UserSearch.prototype.renderResults = function(response) {
+    this.$ul.empty();
+    response.forEach( function (searchedUser) {
+      var templateCode = $("script#user-link-template").html();
+      var templateFn = _.template(templateCode);
+      var html = templateFn( {user: searchedUser} );
+      this.$ul.append(html);
+    }.bind(this))
+    this.$el.find("button.follow-toggle").followToggle();
+  };
+  
+  $.fn.userSearch = function () {
+    return this.each(function () {
+      new $.UserSearch(this);
+    });
+  };
+
+  $(function () {
+    $("div.users-search").userSearch();
+  });
+</script>
+
+
+  <!-- var obj = {
+    // data: this.$el.serialize(),
+    dataType: "json",
+    url: "/users/" + this.userId + "/follow",
+    success: (function () {
+      this.toggleFollowState();
+      this.render();
+    }.bind(this)),
+    error: (function () {console.log("Something went wrong!")})
+  }; -->

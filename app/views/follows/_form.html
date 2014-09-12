@@ -1,0 +1,55 @@
+<button type="button"
+        class="follow-toggle"
+        data-user-id=""
+        data-initial-follow-state=""></button>
+
+<script>
+$.FollowToggle = function (el) {
+  this.$el = $(el);
+  this.userId = this.$el.data("user-id");
+  this.followState = this.$el.data("initial-follow-state");
+  this.render();
+};
+
+$.FollowToggle.prototype.render = function(){
+  if(this.followState === "followed"){
+    return "Unfollow!";
+  } else {
+    return "Follow!";
+  }
+};
+
+$.FollowToggle.prototype.toggleFollowState = function () {
+  this.followState =
+    (this.followState === "followed" ? "unfollowed" : "followed");
+};
+
+$.FollowToggle.prototype.handleClick = function(event){
+  event.preventDefault();
+  var obj = {
+    data: $("form"),
+    url: "/users/" + this.userId + "/follow",
+    success: function () {
+      this.toggleFollowState();
+      this.render();
+    }
+  };
+  
+  if(this.followState === "Follow!") {
+    obj["type"] = "POST";
+  } else {
+    obj["type"] = "DELETE";
+  }
+  $.ajax(obj);
+};
+
+$.fn.followToggle = function () {
+  return this.each(function () {
+    new $.FollowToggle(this);
+  });
+};
+
+$(function () {
+  $("button.follow-toggle").followToggle();
+});
+</script>
