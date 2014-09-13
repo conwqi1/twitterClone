@@ -81,7 +81,8 @@
   };
   
   $.TweetCompose.prototype.addMentionedUser = function(){
-     var scriptTag = this.$el.find("script");
+     var scriptTag = this.$el.find("script").html();
+
      $("div.mentioned-users").append(scriptTag);
   };
   
